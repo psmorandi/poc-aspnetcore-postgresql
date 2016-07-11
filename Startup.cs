@@ -5,6 +5,7 @@ namespace Poc.AspnetCore.Api
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
+    using Repositories;
 
     public class Startup
     {
@@ -14,6 +15,9 @@ namespace Poc.AspnetCore.Api
             services.AddMvc();
 
             services.AddLogging();
+
+            // scoped --> once per request
+            services.AddScoped<IBookRepository, BookRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
