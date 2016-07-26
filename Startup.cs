@@ -1,12 +1,11 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Poc.AspnetCore.Api.Repositories;
+
 namespace Poc.AspnetCore.Api
 {
-    using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Hosting;
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Logging;
-    using Repositories;
-
     public class Startup
     {
         public void ConfigureServices(IServiceCollection services)

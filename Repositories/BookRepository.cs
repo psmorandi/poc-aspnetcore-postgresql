@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Poc.AspnetCore.Api.Models;
@@ -11,10 +11,35 @@ namespace Poc.AspnetCore.Api.Repositories
     {
         async Task<IEnumerable<Book>> IBookRepository.GetAll()
         {
-            using (IDbConnection connection = GetConnection())
+            using (var connection = GetConnection())
             {
-                //TODO: is this possible? 1 -> 1 is possible, but 1 -> N ? maybe should be done in a service class
-                return await connection.QueryAsync<Book, Author, Book>("some query", (book, author) => { book.Authors.Add(author); return book; });
+                var lookup = new Dictionary<int, Book>();
+
+                //http://stackoverflow.com/a/17748734
+                var sql = @"SELECT b.*, a.*
+                            FROM
+                                book as b,
+                                author as a,
+                                author_book as ab
+                             where
+	                            ab.book_id = b.id and
+	                            ab.author_id = a.id";
+                
+                var query = await connection.QueryAsync<Book, Author, Book>(sql, (b, a) =>
+                {
+                    Book book;
+                    if (!lookup.TryGetValue(b.Id, out book))
+                    {
+                        book = b;
+                        lookup.Add(b.Id, b);
+                    }
+
+                    book.Authors.Add(a);
+                    return book;
+                });
+
+                var queryResult = query.ToList();
+                return lookup.Values;
             }
         }
 
