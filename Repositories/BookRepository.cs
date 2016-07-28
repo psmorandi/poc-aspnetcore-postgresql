@@ -3,15 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
+using Microsoft.Extensions.Options;
 using Poc.AspnetCore.Api.Models;
 
 namespace Poc.AspnetCore.Api.Repositories
 {
     public class BookRepository : BaseRepository, IBookRepository
     {
+        private GeneralConfiguration Configurations { get; set; }
+
+        public BookRepository(IOptions<GeneralConfiguration> configurations)
+        {
+            Configurations = configurations.Value;
+        }
+
         async Task<IEnumerable<Book>> IBookRepository.GetAll()
         {
-            using (var connection = GetConnection())
+            using (var connection = GetConnection(Configurations.ConnectionString))
             {
                 var lookup = new Dictionary<int, Book>();
 
